@@ -91,7 +91,7 @@ public class HsimAutoRun {
             Graph estGraph = fgs.search();
             //if (verbose) System.out.println(estGraph);
 
-            Pattern estPattern = new Pattern(estGraph);
+            Graph estPattern = new EdgeListGraphSingleConnections(estGraph);
             PatternToDag patternToDag = new PatternToDag(estPattern);
             Graph estGraphDAG = patternToDag.patternToDagMeek();
             Dag estDAG = new Dag(estGraphDAG);
@@ -168,7 +168,7 @@ public class HsimAutoRun {
             fgsOut.setPenaltyDiscount(2.0);
             //fgsOut.setOut(out);
             //fgsOut.setFaithfulnessAssumed(true);
-            // fgsOut.setDepth(1);
+            // fgsOut.setMaxIndegree(1);
             // fgsOut.setCycleBound(5);
 
             Graph estGraphOut = fgsOut.search();
