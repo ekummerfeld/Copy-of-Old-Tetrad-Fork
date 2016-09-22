@@ -27,6 +27,8 @@ import edu.cmu.tetrad.sem.*;
 import edu.cmu.tetrad.util.*;
 
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
@@ -278,14 +280,40 @@ public class ParallelFOFC {
         ChoiceGenerator gen = new ChoiceGenerator(allVariables.size(), 3);
         int[] choice;
         Set<Set<Integer>> puretriples = new HashSet<>();
-        CHOICE:
+
+        ForkJoinPool pool = ForkJoinPoolInstance.getInstance().getPool();
+
         while ((choice = gen.next()) != null) {
-            int n1 = allVariables.get(choice[0]);
-            int n2 = allVariables.get(choice[1]);
-            int n3 = allVariables.get(choice[2]);
+
+            // for each choice we will create a task that will run on a separate thread
+            pool.invoke(new FindPureTripleTask(allVariables, choice, puretriples));
+
+        }
+        return puretriples;
+    }
+
+    class FindPureTripleTask extends RecursiveTask<Boolean> {
+
+        List<Integer> allVariables;
+        int[] myChoice;
+        Set<Set<Integer>> puretriples;
+
+        public FindPureTripleTask(final List<Integer> allVariables, final int[] choice, final Set<Set<Integer>> puretriples) {
+            this.allVariables = allVariables;
+            this.myChoice = choice;
+            this.puretriples = puretriples;
+        }
+
+        @Override
+        protected Boolean compute() {
+
+            int n1 = allVariables.get(myChoice[0]);
+            int n2 = allVariables.get(myChoice[1]);
+            int n3 = allVariables.get(myChoice[2]);
             List<Integer> triple = triple(n1, n2, n3);
 
-            if (zeroCorr(triple)) continue;
+            if (zeroCorr(triple)) return true;
+
             for (int o : allVariables) {
                 if (triple.contains(o)) {
                     continue;
@@ -293,7 +321,7 @@ public class ParallelFOFC {
                 List<Integer> quartet = quartet(n1, n2, n3, o);
                 boolean vanishes = vanishes(quartet);
                 if (!vanishes) {
-                    continue CHOICE;
+                    return true;
                 }
             }
             HashSet<Integer> _cluster = new HashSet<>(triple);
@@ -301,9 +329,12 @@ public class ParallelFOFC {
                 log("++" + variablesForIndices(triple), false);
             }
             puretriples.add(_cluster);
+
+
+            return true;
         }
-        return puretriples;
     }
+
 
     private Set<Set<Integer>> combinePuretriples(Set<Set<Integer>> puretriples, List<Integer> _variables) {
         log("Growing pure triples.", true);

@@ -28,15 +28,25 @@ public class TestParallelFOFC {
         int samplesize = 1000;
         DataSet data = semim.simulateData(samplesize, (long) 2,false);
         //System.out.println(data);
+
+        long startTime = System.nanoTime();
         FindOneFactorClusters fofc = new FindOneFactorClusters(data,TestType.TETRAD_WISHART,
                 FindOneFactorClusters.Algorithm.GAP,(double) 1/samplesize);
         fofc.search();
         List<List<Node>> clusters = fofc.getClusters();
+        long endTime = System.nanoTime();
         System.out.println(clusters);
+        System.out.println("executed in: " + (endTime - startTime));
+
+        startTime = System.nanoTime();
         ParallelFOFC pFOFC = new ParallelFOFC(data,TestType.TETRAD_WISHART,
                 ParallelFOFC.Algorithm.GAP,(double) 1/samplesize);
         pFOFC.search();
         List<List<Node>> pClusters = pFOFC.getClusters();
         System.out.println(pClusters);
+        endTime = System.nanoTime();
+        System.out.println("executed in: " + (endTime - startTime));
+
+
     }
 }
