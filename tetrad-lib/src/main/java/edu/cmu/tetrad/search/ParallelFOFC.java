@@ -81,7 +81,7 @@ public class ParallelFOFC {
     private Algorithm algorithm = Algorithm.GAP;
 
     //used for the parellel step
-    final int maxThreads = ForkJoinPoolInstance.getInstance().getPool().getParallelism();
+    //final int maxThreads = ForkJoinPoolInstance.getInstance().getPool().getParallelism();
 
     //========================================PUBLIC METHODS====================================//
 

@@ -17,8 +17,8 @@ import java.util.List;
 public class TestParallelFOFC {
     public static void main(String... args){
         //simple factor model with 2 clusters of 4 measures
-        Graph structure = GraphConverter.convert("L0-->X0,L0-->X1,L0-->X2," +
-                "L0-->X3,L1-->X4,L1-->X5,L1-->X6,L1-->X7,L0-->L1");
+        Graph structure = GraphConverter.convert("L0-->X0,L0-->X2,L0-->X4,L0-->X6,X6-->X8," +
+                "L0-->X8,L0-->X10,L1-->X1,L1-->X3,L1-->X5,L1-->X7,L1-->X9,L1-->X11,L0-->L1");
         //make L0 and L1 latent
         structure.getNode("L0").setNodeType(NodeType.LATENT);
         structure.getNode("L1").setNodeType(NodeType.LATENT);
